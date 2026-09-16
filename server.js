@@ -6,7 +6,6 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const { chromium } = require('playwright-core');
-const serverlessChromium = require('@sparticuz/chromium');
 
 const {
   classifyVendor,
@@ -239,6 +238,11 @@ async function browserLaunchOptions() {
     if (process.env.CHROME_EXECUTABLE_PATH) base.executablePath = process.env.CHROME_EXECUTABLE_PATH;
     return base;
   }
+  // @sparticuz/chromium is ESM-only, so it cannot be require()'d from this
+  // CommonJS file -- a top-level require crashes the whole function before a
+  // single route runs. Import it lazily, and only on the runtime that needs it.
+  const mod = await import('@sparticuz/chromium');
+  const serverlessChromium = mod.default || mod;
   return {
     ...base,
     args: [...serverlessChromium.args, ...base.args],
