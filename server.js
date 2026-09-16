@@ -227,6 +227,25 @@ function abridgeUrl(url) {
 /**
  * Drive a real browser at the page and record every ad-tech request it makes.
  */
+// On Vercel (and any other AWS Lambda-style runtime) there is no Chrome on the
+// box, so we boot the @sparticuz/chromium build that ships inside the bundle.
+// Locally that binary is usually absent or the wrong platform, so we fall back
+// to whatever Chrome/Chromium playwright-core can find itself.
+const IS_SERVERLESS = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+async function browserLaunchOptions() {
+  const base = { headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] };
+  if (!IS_SERVERLESS) {
+    if (process.env.CHROME_EXECUTABLE_PATH) base.executablePath = process.env.CHROME_EXECUTABLE_PATH;
+    return base;
+  }
+  return {
+    ...base,
+    args: [...serverlessChromium.args, ...base.args],
+    executablePath: await serverlessChromium.executablePath(),
+  };
+}
+
 async function runBrowserSession(targetUrl, opts = {}) {
   const doInteractions = opts.interactions !== false;
 
@@ -256,11 +275,7 @@ async function runBrowserSession(targetUrl, opts = {}) {
   let consentHandled = false;
 
   try {
-    browser = await chromium.launch({
-      headless: true,
-      args: [...serverlessChromium.args, '--no-sandbox', '--disable-dev-shm-usage'],
-      executablePath: await serverlessChromium.executablePath(),
-    });
+    browser = await chromium.launch(await browserLaunchOptions());
 
     const context = await browser.newContext({
       viewport: { width: 1366, height: 900 },
