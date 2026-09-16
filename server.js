@@ -5,7 +5,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
-const { chromium } = require('playwright');
+const { chromium } = require('playwright-core');
+const serverlessChromium = require('@sparticuz/chromium');
 
 const {
   classifyVendor,
@@ -257,7 +258,8 @@ async function runBrowserSession(targetUrl, opts = {}) {
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-dev-shm-usage'],
+      args: [...serverlessChromium.args, '--no-sandbox', '--disable-dev-shm-usage'],
+      executablePath: await serverlessChromium.executablePath(),
     });
 
     const context = await browser.newContext({
@@ -1143,4 +1145,15 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app, performAudit, runBrowserSession, runDeterministicChecks, score, CHECK_DEFINITIONS, abridgeUrl, DEFAULT_TARGET_URL };
+module.exports = app;
+
+Object.assign(module.exports, {
+  app,
+  performAudit,
+  runBrowserSession,
+  runDeterministicChecks,
+  score,
+  CHECK_DEFINITIONS,
+  abridgeUrl,
+  DEFAULT_TARGET_URL,
+});

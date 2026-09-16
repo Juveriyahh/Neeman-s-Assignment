@@ -15,10 +15,11 @@
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@sparticuz/chromium": "^153.0.0",
     "@supabase/supabase-js": "^2.116.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "playwright": "^1.63.0"
+    "playwright-core": "^1.63.0"
   }
 }
