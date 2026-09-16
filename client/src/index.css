@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-page text-ink font-sans antialiased;
+    font-size: 14px;
+  }
+}
+
+@layer components {
+  /* Neeman's headings: Bebas Neue, uppercase, wide tracking. */
+  .display {
+    @apply font-display uppercase;
+    letter-spacing: 0.18em;
+  }
+  .kicker {
+    @apply font-sans text-[10px] font-medium uppercase text-faint;
+    letter-spacing: 0.18em;
+  }
+  /* Pill buttons, matching --rounded-full: 9999px on the live site. */
+  .btn {
+    @apply rounded-pill px-6 py-2.5 font-sans text-[12px] font-medium uppercase transition-all;
+    letter-spacing: 0.14em;
+  }
+  .btn-primary { @apply btn bg-ink2 text-white hover:bg-ink disabled:opacity-40; }
+  .btn-ghost   { @apply btn border border-ink2 bg-transparent text-ink2 hover:bg-surface; }
+  .card {
+    @apply rounded-2xl border border-line bg-page shadow-sm2;
+  }
+}
